@@ -119,6 +119,8 @@ class CrawDaqingGov(crawBase.CrawBase):
         xxmc = xxmc.replace('/','')
         if not os.path.exists(dic):
             os.makedirs(dic)
+            # print(dir)
+            # os.system('mkdir -p %s' % dic)
         fname = '%s/%s.txt' %(dic, xxmc)
         with open(fname, 'w') as f:
             f.write('网页地址: %s\n' %url)
@@ -154,7 +156,7 @@ class CrawDaqingGov(crawBase.CrawBase):
                 fbbm_raw = fbbm
                 if fbbm == '':
                     fbbm = fbbm1
-                    dic = '%s/%s' %('.'.join(dic.split('\/')[:-1]), fbbm)
+                    dic = '%s/%s' %('/'.join(dic.split('/')[:-1]), fbbm)
                 self.writeUsefulInfo(dic, thirdUrl, r, xxmc, fbrq, fbbm, wh, nr)
                 fbbm = fbbm_raw
                 # break
