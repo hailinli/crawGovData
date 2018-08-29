@@ -56,6 +56,7 @@ python crawTaiyuanjxw.py
 ------
 
 ## 环境
-1. python3
+1. python3.6
 2. requests2.18
 3. lxml4.2
+4. pycharm5.0
