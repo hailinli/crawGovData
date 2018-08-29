@@ -8,6 +8,7 @@
 from lxml import etree
 import crawBase
 import os
+import re
 
 class CrawDaqingGov(crawBase.CrawBase):
 
@@ -59,6 +60,21 @@ class CrawDaqingGov(crawBase.CrawBase):
         # print(self.get(urls[0]))
         return urls
 
+
+    def get_xinxi_dic(self, line):
+        """
+        从标题里解析部门
+        :param st:
+        :return:
+        """
+        RE_RE = ['\[(.*)\]', '\【(.*)\】']
+        for re_RE in RE_RE:
+            m = re.compile(re_RE)
+            gs = m.findall(line)
+            for g in gs:
+                print(g)
+                return g
+
     def getUsefulInfo(self, url):
         '''
         访问url,并下载网页,并解析得到需要的文件
@@ -75,9 +91,13 @@ class CrawDaqingGov(crawBase.CrawBase):
         fbrq = self.split(fbrq, 1, '：')
         wh = self.xpath_text(html, '//div[@class="middle_Content_SubTitle"]')  # 文号
         nr = self.getContent(html, '//div[@class="middle_Content_Content"]')
-        fbbm = self.xpath_text(html, '//div[@class="middle_Content_Other_From"]')
-        fbbm = self.split(fbbm, 1, '：')
-        # print(url)
+        # fbbm = self.xpath_text(html, '//div[@class="middle_Content_Other_From"]')
+        # fbbm = self.split(fbbm, 1, '：')
+        ### print(url)
+        ##################
+        fbbm = str(self.get_xinxi_dic(xxmc)).strip()
+        ##################
+
         # print(r)
         # print(xxmc)
         # print(fbrq)
@@ -97,6 +117,8 @@ class CrawDaqingGov(crawBase.CrawBase):
         :return:
         '''
         xxmc = xxmc.replace('/','')
+        if not os.path.exists(dic):
+            os.makedirs(dic)
         fname = '%s/%s.txt' %(dic, xxmc)
         with open(fname, 'w') as f:
             f.write('网页地址: %s\n' %url)
@@ -129,9 +151,12 @@ class CrawDaqingGov(crawBase.CrawBase):
                 if '' == secUrl:
                     continue
                 thirdUrl, r, xxmc, fbrq, wh, nr, fbbm1 = self.getUsefulInfo(secUrl)
+                fbbm_raw = fbbm
                 if fbbm == '':
                     fbbm = fbbm1
+                    dic = '%s/%s' %('.'.join(dic.split('\/')[:-1]), fbbm)
                 self.writeUsefulInfo(dic, thirdUrl, r, xxmc, fbrq, fbbm, wh, nr)
+                fbbm = fbbm_raw
                 # break
             if self.firstHasNextPage(url):
                 url = self.firstGenPageUrl(url, i)
@@ -149,9 +174,9 @@ if __name__ == '__main__':
     # t.firstPage(firstUri)
     # t.getUsefulInfo(infoUri)
 
-    url = 'http://www.daqing.gov.cn/zfgw/szfwj/'
-    t.run(url, 'data/大庆/市政府文件', '大庆市人民政府')  # 市政府文件
+    # url = 'http://www.daqing.gov.cn/zfgw/szfwj/'
+    # t.run(url, 'data/大庆/市政府文件', '大庆市人民政府')  # 市政府文件
     # url = 'http://www.daqing.gov.cn/zfgw/szfbwj/'
     # t.run(url, 'data/大庆/市政府办文件', '大庆市人民政府办公室')  # 市政府办文件
-    # url = 'http://www.daqing.gov.cn/xxgk/bmxxml/index.shtml'
-    # t.run(url, 'data/大庆/部门文件')  # 部门文件
+    url = 'http://www.daqing.gov.cn/xxgk/bmxxml/index.shtml'
+    t.run(url, 'data/大庆/部门文件')  # 部门文件
